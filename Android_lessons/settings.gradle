@@ -1,2 +1,3 @@
+include ':p0031firstproject'
 include ':app'
 rootProject.name = "Android lessons"
