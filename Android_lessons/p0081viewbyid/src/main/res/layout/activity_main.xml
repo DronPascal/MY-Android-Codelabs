@@ -27,4 +27,14 @@
         app:layout_constraintStart_toStartOf="@+id/myText"
         app:layout_constraintTop_toTopOf="@+id/myText" />
 
+    <CheckBox
+        android:id="@+id/myChb"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="CheckBox"
+        app:layout_constraintBottom_toTopOf="@+id/myText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

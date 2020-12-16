@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
@@ -18,5 +19,8 @@ public class MainActivity extends AppCompatActivity {
         Button myBtn = (Button)findViewById(R.id.myBtn);
         myBtn.setText("My button");
         myBtn.setEnabled(false);
+
+        CheckBox myChb = (CheckBox) findViewById(R.id.myChb);
+        myChb.setChecked(true);
     }
 }
