@@ -19,7 +19,7 @@
             <option value="$PROJECT_DIR$/p0072layoutprop" />
             <option value="$PROJECT_DIR$/p0081viewbyid" />
             <option value="$PROJECT_DIR$/p0091onclickbuttons" />
-
+            <option value="$PROJECT_DIR$/p0111resvalues" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
