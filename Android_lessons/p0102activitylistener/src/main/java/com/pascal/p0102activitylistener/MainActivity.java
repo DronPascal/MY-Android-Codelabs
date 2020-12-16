@@ -45,5 +45,5 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
     public void onClickStart(View v) {
         // действия при нажатии на кнопку
         tvOut.setText("Нажата кнопка Альтернатива");
-    }
+    } 
 }
