@@ -1,14 +1,41 @@
 package com.pascal.p0161dynamiclayout;
 
 import android.os.Bundle;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
+//    @Override
+//    protected void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//        setContentView(R.layout.activity_main);
+//    }
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        // создание LinearLayout
+        LinearLayout linLayout = new LinearLayout(this);
+        // установим вертикальную ориентацию
+        linLayout.setOrientation(LinearLayout.VERTICAL);
+        // создаем LayoutParams
+        LayoutParams linLayoutParam = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+        // устанавливаем linLayout как корневой элемент экрана
+        setContentView(linLayout, linLayoutParam);
+
+        LayoutParams lpView = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+
+        TextView tv = new TextView(this);
+        tv.setText("TextView");
+        tv.setLayoutParams(lpView);
+        linLayout.addView(tv);
+
+        Button btn = new Button(this);
+        btn.setText("Button");
+        linLayout.addView(btn, lpView);
     }
 }
