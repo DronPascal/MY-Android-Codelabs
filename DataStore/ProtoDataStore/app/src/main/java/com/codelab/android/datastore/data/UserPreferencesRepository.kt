@@ -34,10 +34,8 @@ private const val SORT_ORDER_KEY = "sort_order"
 /**
  * Class that handles saving and retrieving user preferences
  */
-class UserPreferencesRepository(
-    private val userPreferencesStore: DataStore<UserPreferences>,
-    context: Context
-) {
+class UserPreferencesRepository(private val userPreferencesStore: DataStore<UserPreferences>) {
+
     private val TAG: String = "UserPreferencesRepo"
 
     val userPreferencesFlow: Flow<UserPreferences> = userPreferencesStore.data
@@ -52,71 +50,60 @@ class UserPreferencesRepository(
         }
 
     suspend fun updateShowCompleted(completed: Boolean) {
-        userPreferencesStore.updateData { preferences ->
-            preferences.toBuilder().setShowCompleted(completed).build()
+        userPreferencesStore.updateData { currentPreferences ->
+            currentPreferences.toBuilder().setShowCompleted(completed).build()
         }
     }
-
-    private val sharedPreferences =
-        context.applicationContext.getSharedPreferences(USER_PREFERENCES_NAME, Context.MODE_PRIVATE)
-
-    // Keep the sort order as a stream of changes
-    private val _sortOrderFlow = MutableStateFlow(sortOrder)
-    val sortOrderFlow: StateFlow<SortOrder> = _sortOrderFlow
 
     /**
-     * Get the sort order. By default, sort order is None.
+     * Enable / disable sort by deadline.
      */
-    private val sortOrder: SortOrder
-        get() {
-            val order = sharedPreferences.getString(SORT_ORDER_KEY, SortOrder.NONE.name)
-            return SortOrder.valueOf(order ?: SortOrder.NONE.name)
-        }
-
-    fun enableSortByDeadline(enable: Boolean) {
-        val currentOrder = sortOrderFlow.value
-        val newSortOrder =
-            if (enable) {
-                if (currentOrder == SortOrder.BY_PRIORITY) {
-                    SortOrder.BY_DEADLINE_AND_PRIORITY
+    suspend fun enableSortByDeadline(enable: Boolean) {
+        // updateData handles data transactionally, ensuring that if the sort is updated at the same
+        // time from another thread, we won't have conflicts
+        userPreferencesStore.updateData { currentPreferences ->
+            val currentOrder = currentPreferences.sortOrder
+            val newSortOrder =
+                if (enable) {
+                    if (currentOrder == SortOrder.BY_PRIORITY) {
+                        SortOrder.BY_DEADLINE_AND_PRIORITY
+                    } else {
+                        SortOrder.BY_DEADLINE
+                    }
                 } else {
-                    SortOrder.BY_DEADLINE
+                    if (currentOrder == SortOrder.BY_DEADLINE_AND_PRIORITY) {
+                        SortOrder.BY_PRIORITY
+                    } else {
+                        SortOrder.NONE
+                    }
                 }
-            } else {
-                if (currentOrder == SortOrder.BY_DEADLINE_AND_PRIORITY) {
-                    SortOrder.BY_PRIORITY
-                } else {
-                    SortOrder.NONE
-                }
-            }
-        updateSortOrder(newSortOrder)
-        _sortOrderFlow.value = newSortOrder
-    }
-
-    fun enableSortByPriority(enable: Boolean) {
-        val currentOrder = sortOrderFlow.value
-        val newSortOrder =
-            if (enable) {
-                if (currentOrder == SortOrder.BY_DEADLINE) {
-                    SortOrder.BY_DEADLINE_AND_PRIORITY
-                } else {
-                    SortOrder.BY_PRIORITY
-                }
-            } else {
-                if (currentOrder == SortOrder.BY_DEADLINE_AND_PRIORITY) {
-                    SortOrder.BY_DEADLINE
-                } else {
-                    SortOrder.NONE
-                }
-            }
-        updateSortOrder(newSortOrder)
-        _sortOrderFlow.value = newSortOrder
-    }
-
-    private fun updateSortOrder(sortOrder: SortOrder) {
-        sharedPreferences.edit {
-            putString(SORT_ORDER_KEY, sortOrder.name)
+            currentPreferences.toBuilder().setSortOrder(newSortOrder).build()
         }
     }
 
+    /**
+     * Enable / disable sort by priority.
+     */
+    suspend fun enableSortByPriority(enable: Boolean) {
+        // updateData handles data transactionally, ensuring that if the sort is updated at the same
+        // time from another thread, we won't have conflicts
+        userPreferencesStore.updateData { currentPreferences ->
+            val currentOrder = currentPreferences.sortOrder
+            val newSortOrder =
+                if (enable) {
+                    if (currentOrder == SortOrder.BY_DEADLINE) {
+                        SortOrder.BY_DEADLINE_AND_PRIORITY
+                    } else {
+                        SortOrder.BY_PRIORITY
+                    }
+                } else {
+                    if (currentOrder == SortOrder.BY_DEADLINE_AND_PRIORITY) {
+                        SortOrder.BY_DEADLINE
+                    } else {
+                        SortOrder.NONE
+                    }
+                }
+            currentPreferences.toBuilder().setSortOrder(newSortOrder).build()
+        }
+    }
 }
