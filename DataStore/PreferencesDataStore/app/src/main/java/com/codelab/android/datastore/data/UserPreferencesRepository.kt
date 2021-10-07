@@ -61,7 +61,8 @@ class UserPreferencesRepository(
             // Get the sort order from preferences and convert it to a [SortOrder] object
             val sortOrder =
                 SortOrder.valueOf(
-                    preferences[PreferencesKeys.SORT_ORDER] ?: SortOrder.NONE.name)
+                    preferences[PreferencesKeys.SORT_ORDER] ?: SortOrder.NONE.name
+                )
 
             // Get our show completed value, defaulting to false if not set:
             val showCompleted = preferences[PreferencesKeys.SHOW_COMPLETED] ?: false
