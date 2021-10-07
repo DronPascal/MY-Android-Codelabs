@@ -18,8 +18,15 @@ package com.codelab.android.datastore.data
 
 import android.content.Context
 import androidx.core.content.edit
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.*
+import kotlinx.coroutines.flow.*
+import java.io.IOException
+
+data class UserPreferences(
+    val showCompleted: Boolean,
+    val sortOrder: SortOrder
+)
 
 private const val USER_PREFERENCES_NAME = "user_preferences"
 private const val SORT_ORDER_KEY = "sort_order"
@@ -34,7 +41,39 @@ enum class SortOrder {
 /**
  * Class that handles saving and retrieving user preferences
  */
-class UserPreferencesRepository private constructor(context: Context) {
+class UserPreferencesRepository(
+    private val userPreferencesStore: DataStore<Preferences>,
+    context: Context
+) {
+    private object PreferencesKeys {
+        val SHOW_COMPLETED = booleanPreferencesKey("show_completed")
+        val SORT_ORDER = stringPreferencesKey("sort_order")
+    }
+
+    val userPreferencesFlow: Flow<UserPreferences> = userPreferencesStore.data
+        .catch { exception ->
+            if (exception is IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw exception
+            }
+        }.map { preferences ->
+            // Get the sort order from preferences and convert it to a [SortOrder] object
+            val sortOrder =
+                SortOrder.valueOf(
+                    preferences[PreferencesKeys.SORT_ORDER] ?: SortOrder.NONE.name
+                )
+
+            // Get our show completed value, defaulting to false if not set:
+            val showCompleted = preferences[PreferencesKeys.SHOW_COMPLETED] ?: false
+            UserPreferences(showCompleted, sortOrder)
+        }
+
+    suspend fun updateShowCompleted(showCompleted: Boolean) {
+        userPreferencesStore.edit { preferences ->
+            preferences[PreferencesKeys.SHOW_COMPLETED] = showCompleted
+        }
+    }
 
     private val sharedPreferences =
         context.applicationContext.getSharedPreferences(USER_PREFERENCES_NAME, Context.MODE_PRIVATE)
@@ -52,66 +91,59 @@ class UserPreferencesRepository private constructor(context: Context) {
             return SortOrder.valueOf(order ?: SortOrder.NONE.name)
         }
 
-    fun enableSortByDeadline(enable: Boolean) {
-        val currentOrder = sortOrderFlow.value
-        val newSortOrder =
-            if (enable) {
-                if (currentOrder == SortOrder.BY_PRIORITY) {
-                    SortOrder.BY_DEADLINE_AND_PRIORITY
+    suspend fun enableSortByDeadline(enable: Boolean) {
+        userPreferencesStore.edit { preferences ->
+            // Get the current SortOrder as an enum
+            val currentOrder = SortOrder.valueOf(
+                preferences[PreferencesKeys.SORT_ORDER] ?: SortOrder.NONE.name
+            )
+
+            val newSortOrder =
+                if (enable) {
+                    if (currentOrder == SortOrder.BY_PRIORITY) {
+                        SortOrder.BY_DEADLINE_AND_PRIORITY
+                    } else {
+                        SortOrder.BY_DEADLINE
+                    }
                 } else {
-                    SortOrder.BY_DEADLINE
+                    if (currentOrder == SortOrder.BY_DEADLINE_AND_PRIORITY) {
+                        SortOrder.BY_PRIORITY
+                    } else {
+                        SortOrder.NONE
+                    }
                 }
-            } else {
-                if (currentOrder == SortOrder.BY_DEADLINE_AND_PRIORITY) {
-                    SortOrder.BY_PRIORITY
-                } else {
-                    SortOrder.NONE
-                }
-            }
-        updateSortOrder(newSortOrder)
-        _sortOrderFlow.value = newSortOrder
+            preferences[PreferencesKeys.SORT_ORDER] = newSortOrder.name
+        }
     }
 
-    fun enableSortByPriority(enable: Boolean) {
-        val currentOrder = sortOrderFlow.value
-        val newSortOrder =
-            if (enable) {
-                if (currentOrder == SortOrder.BY_DEADLINE) {
-                    SortOrder.BY_DEADLINE_AND_PRIORITY
+    suspend fun enableSortByPriority(enable: Boolean) {
+        userPreferencesStore.edit { preferences ->
+            // Get the current SortOrder as an enum
+            val currentOrder = SortOrder.valueOf(
+                preferences[PreferencesKeys.SORT_ORDER] ?: SortOrder.NONE.name
+            )
+
+            val newSortOrder =
+                if (enable) {
+                    if (currentOrder == SortOrder.BY_DEADLINE) {
+                        SortOrder.BY_DEADLINE_AND_PRIORITY
+                    } else {
+                        SortOrder.BY_PRIORITY
+                    }
                 } else {
-                    SortOrder.BY_PRIORITY
+                    if (currentOrder == SortOrder.BY_DEADLINE_AND_PRIORITY) {
+                        SortOrder.BY_DEADLINE
+                    } else {
+                        SortOrder.NONE
+                    }
                 }
-            } else {
-                if (currentOrder == SortOrder.BY_DEADLINE_AND_PRIORITY) {
-                    SortOrder.BY_DEADLINE
-                } else {
-                    SortOrder.NONE
-                }
-            }
-        updateSortOrder(newSortOrder)
-        _sortOrderFlow.value = newSortOrder
+            preferences[PreferencesKeys.SORT_ORDER] = newSortOrder.name
+        }
     }
 
     private fun updateSortOrder(sortOrder: SortOrder) {
         sharedPreferences.edit {
             putString(SORT_ORDER_KEY, sortOrder.name)
-        }
-    }
-
-    companion object {
-        @Volatile
-        private var INSTANCE: UserPreferencesRepository? = null
-
-        fun getInstance(context: Context): UserPreferencesRepository {
-            return INSTANCE ?: synchronized(this) {
-                INSTANCE?.let {
-                    return it
-                }
-
-                val instance = UserPreferencesRepository(context)
-                INSTANCE = instance
-                instance
-            }
         }
     }
 }
