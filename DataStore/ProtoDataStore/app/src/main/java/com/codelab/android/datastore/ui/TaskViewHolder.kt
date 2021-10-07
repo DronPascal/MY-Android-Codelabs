@@ -25,7 +25,7 @@ import com.codelab.android.datastore.data.Task
 import com.codelab.android.datastore.data.TaskPriority
 import com.codelab.android.datastore.databinding.TaskViewItemBinding
 import java.text.SimpleDateFormat
-import java.util.Locale
+import java.util.*
 
 /**
  * Holder for a task item in the tasks list

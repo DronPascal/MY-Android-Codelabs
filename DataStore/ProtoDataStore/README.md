@@ -1,12 +1,20 @@
 # DataStore codelab
 
-Supporting code for [Preferences DataStore codelab](https://codelabs.developers.google.com/codelabs/android-preferences-datastore/#0) and [Proto DataStore codelab](https://codelabs.developers.google.com/codelabs/android-proto-datastore/#0).
+Supporting code
+for [Preferences DataStore codelab](https://codelabs.developers.google.com/codelabs/android-preferences-datastore/#0)
+and [Proto DataStore codelab](https://codelabs.developers.google.com/codelabs/android-proto-datastore/#0)
+.
 
-DataStore is a new and improved data storage solution aimed at replacing SharedPreferences. Built on Kotlin coroutines and Flow, DataStore provides two different implementations: Proto DataStore, that lets you store typed objects (backed by protocol buffers) and Preferences DataStore, that stores key-value pairs. Data is stored asynchronously, consistently, and transactionally, overcoming some of the drawbacks of SharedPreferences.
+DataStore is a new and improved data storage solution aimed at replacing SharedPreferences. Built on
+Kotlin coroutines and Flow, DataStore provides two different implementations: Proto DataStore, that
+lets you store typed objects (backed by protocol buffers) and Preferences DataStore, that stores
+key-value pairs. Data is stored asynchronously, consistently, and transactionally, overcoming some
+of the drawbacks of SharedPreferences.
 
 
 License
 --------
+
 ```
 Copyright 2020 The Android Open Source Project
 

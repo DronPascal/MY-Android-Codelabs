@@ -16,17 +16,13 @@
 
 package com.codelab.android.datastore.data
 
-import android.content.Context
 import android.util.Log
-import androidx.core.content.edit
 import androidx.datastore.core.DataStore
 import com.codelab.android.datastore.UserPreferences
+import com.codelab.android.datastore.UserPreferences.SortOrder
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import java.io.IOException
-import com.codelab.android.datastore.UserPreferences.SortOrder
 
 private const val USER_PREFERENCES_NAME = "user_preferences"
 private const val SORT_ORDER_KEY = "sort_order"
