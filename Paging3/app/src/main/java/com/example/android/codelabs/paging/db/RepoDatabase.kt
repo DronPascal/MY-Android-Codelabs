@@ -17,6 +17,7 @@ import com.example.android.codelabs.paging.model.Repo
 abstract class RepoDatabase : RoomDatabase() {
 
     abstract fun reposDao(): RepoDao
+    abstract fun remoteKeysDao(): RemoteKeysDao
 
     companion object {
 
