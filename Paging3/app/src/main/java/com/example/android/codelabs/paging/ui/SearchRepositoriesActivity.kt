@@ -29,13 +29,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.codelabs.paging.Injection
 import com.example.android.codelabs.paging.databinding.ActivitySearchRepositoriesBinding
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.distinctUntilChangedBy
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class SearchRepositoriesActivity : AppCompatActivity() {
