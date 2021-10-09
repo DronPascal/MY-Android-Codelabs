@@ -10,7 +10,7 @@ import com.example.android.codelabs.paging.model.Repo
  * Created by dronpascal on 09.10.2021.
  */
 @Database(
-    entities = [Repo::class],
+    entities = [Repo::class, RemoteKeys::class],
     version = 1,
     exportSchema = false
 )
@@ -31,8 +31,10 @@ abstract class RepoDatabase : RoomDatabase() {
             }
 
         private fun buildDatabase(context: Context) =
-            Room.databaseBuilder(context.applicationContext,
-                RepoDatabase::class.java, "Github.db")
+            Room.databaseBuilder(
+                context.applicationContext,
+                RepoDatabase::class.java, "Github.db"
+            )
                 .build()
     }
 }
